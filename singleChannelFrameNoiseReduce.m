@@ -1,7 +1,8 @@
-function [out, posterior] = singleChannelFrameNoiseReduce(in, prior)
-    out = in;
-    cut = 100;
-    out(1:cut) = 0;
-    out((end-cut):end) = 0;
+function [out, posterior] = singleChannelFrameNoiseReduce(in, history, prior)
+    amp = abs(in);
+    phase = angle(in);
+    noise = min(abs(history), [], 2);
+    amp = max(min(amp, 0.01), amp - 16 * noise);
+    out = amp .* exp(1i .* phase);
     posterior = prior;
 end
