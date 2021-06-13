@@ -1,16 +1,16 @@
-function [out, eSigma] = mmseNoiseReduce(in, prev, sigma, eSigmaPrev, prior)
+function [out, eSigma] = mmseNoiseReduce(in, prev, eSigmaPrev, prior)
     amp = abs(in);
     %phase = angle(in);
     amp2 = amp*amp;
     % step 1. compute xi(k, i)
-    y = amp/sigma;
+    y = amp/eSigmaPrev;
     xi = max(y - 1, 0);
     % step 2. compute E(N^2|y;xi(k, i))
     E = ((1/(1+xi)^2) + (xi/((1+xi)*prior)))*amp2;
     % step 3. get xiDD using decision-directed approach https://ieeexplore.ieee.org/abstract/document/1164453
     eA = (E/(1+E))*abs(prev);
     x = 0.8;
-    xidd = x*(eA/sigma) + (1-x)*max(0, y - 1);
+    xidd = x*(eA/eSigmaPrev) + (1-x)*max(0, y - 1);
     % step 4. B(xidd)
     g = gammainc(2, 1/(1+Edd));
     B = 1/((1+xidd)*g + exp(-(1/(1+xidd))));
